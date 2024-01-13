@@ -20,7 +20,7 @@ int replacementCount = 0, fileCount = 0;
 
 var optionsParser = new CommandLineApplication<Options> {
     UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.Throw,
-    Description                  = "Update copyright years in project sources. Handles .NET SDK-style .csproj files and .NET AssemblyInfo.cs files."
+    Description                  = "Automatically update copyright years in project sources. Handles .NET SDK-style .csproj files and .NET AssemblyInfo.cs files."
 };
 optionsParser.Conventions.UseDefaultConventions();
 optionsParser.ExtendedHelpText = $"""
