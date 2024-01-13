@@ -1,0 +1,33 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    env:
+      ProjectName: Copywriter
+      TargetPlatform: win-x64
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Clone
+      uses: actions/checkout@v3
+        
+    - name: Restore
+      run: dotnet restore --runtime ${{ env.TargetPlatform }} --locked-mode --verbosity normal
+
+    - name: Build
+      run: dotnet build ${{ env.ProjectName }} --no-restore --runtime ${{ env.TargetPlatform }} --configuration Release --no-self-contained --verbosity normal
+
+    - name: Publish
+      run: dotnet publish ${{ env.ProjectName }} --no-build --configuration Release -p:PublishSingleFile=true --runtime ${{ env.TargetPlatform }} --self-contained false
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ env.ProjectName }}.exe
+        path: ${{ env.ProjectName }}/bin/Release/**/publish/*.exe

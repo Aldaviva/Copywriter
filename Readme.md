@@ -1,6 +1,8 @@
 <img src="https://raw.githubusercontent.com/Aldaviva/Copywriter/master/Copywriter/%C2%A9.ico" height="24" alt="©"> Copywriter
 ===
 
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/Aldaviva/Copywriter/dotnet.yml?branch=master&logo=github)](https://github.com/Aldaviva/Copywriter/actions/workflows/dotnet.yml)
+
 Automatically update copyright years in project sources.
 
 <!-- MarkdownTOC autolink="true" bracket="round" autoanchor="false" levels="1,2" -->
