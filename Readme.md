@@ -72,7 +72,6 @@ If the current year is 2024, you can use this program to automatically update th
 
 ## Prerequisites
 - [.NET Runtime 8 for Windows x64 or later](https://dotnet.microsoft.com/en-us/download)
-    - This program isn't Windows-specific, so you can also clone and run it on other operating systems like Linux and MacOS
 
 ## Installation
 1. Download [`Copywriter.exe`](https://github.com/Aldaviva/Copywriter/releases/latest/download/Copywriter.exe) from the [latest release](https://github.com/Aldaviva/Copywriter/releases/latest).
