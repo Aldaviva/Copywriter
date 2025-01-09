@@ -129,7 +129,7 @@ You can pass this multiple times to exclude multiple directories.
 Copywriter --exclude-dir "lib" --exclude-dir "vendor" --exclude-dir "thirdparty"
 ```
 
-### `-exclude-name <N>`
+### `--exclude-name <N>`
 Do not update the copyright text if this string appears within it.
 
 You can pass this multiple times to skip copyright lines that contain **any** of the excluded strings.
@@ -138,7 +138,7 @@ You can pass this multiple times to skip copyright lines that contain **any** of
 Copywriter --exclude-name "Microsoft"
 ```
 
-### `-include-name <N>`
+### `--include-name <N>`
 Only update the copyright text if this string appears within it.
 
 You can pass this multiple times to skip copyright lines that do not contain **any** of the included strings.
