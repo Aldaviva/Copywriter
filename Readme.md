@@ -18,14 +18,15 @@ Automatically update copyright years in project sources.
 
 ## Quick Start
 ```ps1
+Copywriter --max-depth 3 --dry-run
 Copywriter --max-depth 3
 ```
 
-This will change all of the copyright years to the current year in supported files in the current working directory, as well as three levels of subdirectories.
+After showing a preview, this will change all of the copyright years to the current year in supported files in the current working directory and all subdirectories up to 3 levels deep.
 
 ## Behavior
 
-For each supported file found in the given parent directory, all copyright strings will be searched for four-digit numbers. The **last occurrence** in each copyright string will be replaced with the new year. This means that ranges and lists should correctly update the latest year only. For example, in 2024 the following copyright string would only update the year 2023.
+For each [supported file](#supported-files) found in the given [parent directory](#parentdirectory), all copyright strings will be searched for four-digit numbers. The **last occurrence** in each copyright string will be replaced with the new year. This means that ranges and lists should correctly update the latest year only. For example, in 2024 the following copyright string would only update the year 2023, not 1994, 2009, 2010, or 2019.
 
 ```diff
 - © 1994-2009 Sun, 2010-2019 Oracle, 2019-2023 Apache
@@ -78,11 +79,19 @@ If the current year is 2024, you can use this program to automatically update th
 
 ## Usage
 
+### Syntax
 ```ps1
 Copywriter [options] <parentDirectory>
 ```
 
-### `parentDirectory`
+### Example
+```ps1
+Copywriter --max-depth 3 --include-name Ben ~\Documents\Projects
+```
+
+### Options
+
+#### `parentDirectory`
 The directory in which to search for `.csproj` and `AssemblyInfo.cs` files.
 
 Optional. If omitted, it uses the current working directory.
@@ -95,14 +104,14 @@ Copywriter
 Copywriter "C:\Users\Ben\Documents\Projects\Copywriter\Copywriter"
 ```
 
-### `-n`, `--dry-run`
+#### `-n`, `--dry-run`
 Preview the changes that would be made, but don't actually save them.
 
 ```ps1
 Copywriter -n
 ```
 
-### `-d <N>`, `--max-depth <N>`
+#### `-d <N>`, `--max-depth <N>`
 Recursively search for files in at most `<N>` levels of subdirectories.
 
 Optional. If omitted, defaults to `0`, which only searches for files in the current working directory, but not in any of its subdirectories.
@@ -111,7 +120,7 @@ Optional. If omitted, defaults to `0`, which only searches for files in the curr
 Copywriter -d 3 "C:\Users\Ben\Documents\Projects"
 ```
 
-### `-y <Y>`, `--year <Y>`
+#### `-y <Y>`, `--year <Y>`
 Set the copyright year to be this custom year, instead of the current year.
 
 Useful if you're preparing a future release on December 31, for example.
@@ -120,8 +129,8 @@ Useful if you're preparing a future release on December 31, for example.
 Copywriter -y 2024
 ```
 
-### `--exclude-dir <D>`
-Specify a directory name that should not be searched for files.
+#### `--exclude-dir <D>`
+Specify a directory name that should not be searched for files. All subdirectories and files will be excluded if this directory name appears at any level in their path &mdash; it's not relative to the `parentDirectory`, and can't contain multiple path segments like `a/b`.
 
 You can pass this multiple times to exclude multiple directories.
 
@@ -129,19 +138,19 @@ You can pass this multiple times to exclude multiple directories.
 Copywriter --exclude-dir "lib" --exclude-dir "vendor" --exclude-dir "thirdparty"
 ```
 
-### `--exclude-name <N>`
+#### `--exclude-name <N>`
 Do not update the copyright text if this string appears within it.
 
-You can pass this multiple times to skip copyright lines that contain **any** of the excluded strings.
+You can pass this multiple times to skip copyright lines that contain **any** of the excluded strings. Exclusion takes precedence over inclusion.
 
 ```ps1
 Copywriter --exclude-name "Microsoft"
 ```
 
-### `--include-name <N>`
+#### `--include-name <N>`
 Only update the copyright text if this string appears within it.
 
-You can pass this multiple times to skip copyright lines that do not contain **any** of the included strings.
+You can pass this multiple times to skip copyright lines that do **not** contain **any** of the included strings. Exclusion takes precedence over inclusion.
 
 ```ps1
 Copywriter --include-name "Ben Hutchison" --include-name "Benjamin Hutchison"
