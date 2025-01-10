@@ -86,7 +86,7 @@ Copywriter [options] <parentDirectory>
 
 ### Example
 ```ps1
-Copywriter --max-depth 3 --include-name Ben ~\Documents\Projects
+Copywriter --max-depth 3 --include-name 'Ben' --include-name '$(Authors)' ~\Documents\Projects
 ```
 
 ### Options
