@@ -4,27 +4,30 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-        <Version>0.0.0</Version>
+        <Version>0.0.1</Version>
         <Authors>Ben Hutchison</Authors>
-        <Copyright>© 2024 $(Authors)</Copyright>
+        <Copyright>© 2026 $(Authors)</Copyright>
         <AssemblyTitle>Copyright updater</AssemblyTitle>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <NoWarn>CS8524</NoWarn>
+        <NoWarn>$(NoWarn);8524</NoWarn>
         <RollForward>major</RollForward>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <ApplicationIcon>©.ico</ApplicationIcon>
+        <DebugType>embedded</DebugType>
+        <SelfContained>false</SelfContained>
     </PropertyGroup>
 
     <ItemGroup>
         <Content Include="©.ico" />
+        <None Include="..\Readme.md;..\.github*\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bom.Squad" Version="0.2.1" />
+        <PackageReference Include="Bom.Squad" Version="0.3.0" />
         <PackageReference Include="Colorful.Console" Version="1.2.15" />
-        <PackageReference Include="DiffPlex" Version="1.7.2" />
-        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.0" />
+        <PackageReference Include="DiffPlex" Version="1.9.0" />
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     </ItemGroup>
 
 </Project>

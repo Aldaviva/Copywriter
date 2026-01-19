@@ -26,11 +26,11 @@ After showing a preview, this will change all of the copyright years to the curr
 
 ## Behavior
 
-For each [supported file](#supported-files) found in the given [parent directory](#parentdirectory), all copyright strings will be searched for four-digit numbers. The **last occurrence** in each copyright string will be replaced with the new year. This means that ranges and lists should correctly update the latest year only. For example, in 2024 the following copyright string would only update the year 2023, not 1994, 2009, 2010, or 2019.
+For each [supported file](#supported-files) found in the given [parent directory](#parentdirectory), all copyright strings will be searched for four-digit numbers. The **last occurrence** in each copyright string will be replaced with the new year. This means that ranges and lists should correctly update the latest year only. For example, in 2026 the following copyright string would only update the year 2023, not 1994, 2009, 2010, or 2019.
 
 ```diff
 - © 1994-2009 Sun, 2010-2019 Oracle, 2019-2023 Apache
-+ © 1994-2009 Sun, 2010-2019 Oracle, 2019-2024 Apache
++ © 1994-2009 Sun, 2010-2019 Oracle, 2019-2026 Apache
 ```
 
 The rest of the string will be left unmodified, including names, punctutation, and symbols like ©. This program does not rely on any formats in the copyright string besides a four-digit year appearing somewhere.
@@ -39,7 +39,7 @@ The rest of the string will be left unmodified, including names, punctutation, a
 
 ### .NET SDK-style project
 
-.NET projects with the `<Project Sdk="Microsoft.NET.Sdk">` (or the `.Web` variant for ASP.NET Core) can use the `<Copyright>` property.
+.NET projects with the `<Project Sdk="Microsoft.NET.Sdk*">` root element can use the `<Copyright>` property.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -49,10 +49,10 @@ The rest of the string will be left unmodified, including names, punctutation, a
 </Project>
 ```
 
-If the current year is 2024, you can use this program to automatically update the property to
+If the current year is 2026, you can use this program to automatically update the property to
 
 ```xml
-<Copyright>© 2024 $(Authors)</Copyright>
+<Copyright>© 2026 $(Authors)</Copyright>
 ```
 
 ### .NET AssemblyInfo file
@@ -65,10 +65,10 @@ using System.Reflection;
 [assembly: AssemblyCopyright("© 2023 Ben Hutchison")]
 ```
 
-If the current year is 2024, you can use this program to automatically update the attribute to
+If the current year is 2026, you can use this program to automatically update the attribute to
 
 ```cs
-[assembly: AssemblyCopyright("© 2024 Ben Hutchison")]
+[assembly: AssemblyCopyright("© 2026 Ben Hutchison")]
 ```
 
 ## Prerequisites
@@ -126,7 +126,7 @@ Set the copyright year to be this custom year, instead of the current year.
 Useful if you're preparing a future release on December 31, for example.
 
 ```ps1
-Copywriter -y 2024
+Copywriter -y 2027
 ```
 
 #### `--exclude-dir <D>`
@@ -144,7 +144,7 @@ Do not update the copyright text if this string appears within it.
 You can pass this multiple times to skip copyright lines that contain **any** of the excluded strings. Exclusion takes precedence over inclusion.
 
 ```ps1
-Copywriter --exclude-name "Microsoft"
+Copywriter --exclude-name 'Microsoft'
 ```
 
 #### `--include-name <N>`
@@ -153,5 +153,5 @@ Only update the copyright text if this string appears within it.
 You can pass this multiple times to skip copyright lines that do **not** contain **any** of the included strings. Exclusion takes precedence over inclusion.
 
 ```ps1
-Copywriter --include-name "Ben Hutchison" --include-name "Benjamin Hutchison"
+Copywriter --include-name 'Ben Hutchison' --include-name 'Benjamin Hutchison' --include-name '$(Authors)'
 ```

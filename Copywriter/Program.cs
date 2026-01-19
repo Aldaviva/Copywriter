@@ -1,4 +1,4 @@
-﻿using Bom.Squad;
+using Bom.Squad;
 using Copywriter;
 using DiffPlex.Chunkers;
 using DiffPlex.DiffBuilder;
@@ -17,6 +17,7 @@ Console.OutputEncoding = Encoding.UTF8; // make command prompt show "©" instead
 Regex yearPattern = new(@"\b\d{4}\b", RegexOptions.RightToLeft);
 
 int replacementCount = 0, fileCount = 0;
+int currentYear      = DateTime.Now.Year;
 
 var optionsParser = new CommandLineApplication<Options> {
     UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.Throw,
@@ -25,19 +26,19 @@ var optionsParser = new CommandLineApplication<Options> {
 optionsParser.Conventions.UseDefaultConventions();
 optionsParser.ExtendedHelpText = $"""
 
-                                  Examples:
-                                    Update copyright year for the .csproj file in the current directory:
-                                      {optionsParser.Name}
-                                      
-                                    Preview changes, but don't write them:
-                                      {optionsParser.Name} --dry-run
-                                  
-                                    Update copyright year in the current directory and 2 levels of subdirectories:
-                                      {optionsParser.Name} --max-depth 2
-                                  
-                                    Update all projects with a copyright owner of Ben Hutchison:
-                                      {optionsParser.Name} -d 3 --include-name "Ben Hutchison" "C:\Users\Ben\Documents\Projects"
-                                  """;
+    Examples:
+      Update copyright year for the .csproj file in the current directory:
+        {optionsParser.Name}
+        
+      Preview changes, but don't write them:
+        {optionsParser.Name} --dry-run
+
+      Update copyright year in the current directory and 2 levels of subdirectories:
+        {optionsParser.Name} --max-depth 2
+
+      Update all projects with copyright owners of either Ben or $(Authors):
+        {optionsParser.Name} -d 3 --include-name 'Ben' --include-name '$(Authors)' "C:\Users\Ben\Documents\Projects"
+    """;
 optionsParser.Parse(args);
 Options options = optionsParser.Model;
 if (optionsParser.OptionHelp?.HasValue() ?? false) {
@@ -149,7 +150,7 @@ async Task handleCsprojFile(string filename) {
     }
 }
 
-string replaceYear(string existingCopyrightLine) => yearPattern.Replace(existingCopyrightLine, (options.year ?? DateTime.Now.Year).ToString(), 1);
+string replaceYear(string existingCopyrightLine) => yearPattern.Replace(existingCopyrightLine, (options.year ?? currentYear).ToString(), 1);
 
 bool isAllowedToEdit(string copyrightLine) =>
     options.excludeCopyrightOwnerNames.All(excluded => !copyrightLine.Contains(excluded, StringComparison.CurrentCulture)) &&
