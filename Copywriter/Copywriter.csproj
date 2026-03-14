@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <Version>0.0.1</Version>
         <Authors>Ben Hutchison</Authors>
@@ -10,7 +10,7 @@
         <AssemblyTitle>Copyright updater</AssemblyTitle>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <NoWarn>$(NoWarn);8524</NoWarn>
+        <LangVersion>latest</LangVersion>
         <RollForward>major</RollForward>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <ApplicationIcon>©.ico</ApplicationIcon>
@@ -25,9 +25,9 @@
 
     <ItemGroup>
         <PackageReference Include="Bom.Squad" Version="0.3.0" />
-        <PackageReference Include="Colorful.Console" Version="1.2.15" />
         <PackageReference Include="DiffPlex" Version="1.9.0" />
-        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="5.0.1" />
+        <PackageReference Include="Unfucked" Version="0.0.1-beta.32" />
     </ItemGroup>
 
 </Project>

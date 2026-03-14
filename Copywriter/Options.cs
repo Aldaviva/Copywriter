@@ -1,8 +1,8 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace Copywriter;
 
-public class Options {
+public sealed class Options {
 
     [Option("-n|--dry-run", "Preview but don't write changes to any files.", CommandOptionType.NoValue)]
     public bool isDryRun { get; set; }

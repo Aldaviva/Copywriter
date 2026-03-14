@@ -39,7 +39,7 @@ The rest of the string will be left unmodified, including names, punctutation, a
 
 ### .NET SDK-style project
 
-.NET projects with the `<Project Sdk="Microsoft.NET.Sdk*">` root element can use the `<Copyright>` property.
+.NET projects with the `<Project Sdk="Microsoft.NET.Sdk*">` root element and [`<GenerateAssemblyInfo>`](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#generateassemblyinfo) not set to `false` can use the [`<Copyright>`](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assemblycopyrightattribute) property.
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -55,9 +55,15 @@ If the current year is 2026, you can use this program to automatically update th
 <Copyright>© 2026 $(Authors)</Copyright>
 ```
 
+### MSBuild default folder properties
+
+Folders with a [`Directory.Build.props`](https://learn.microsoft.com/en-us/visualstudio/msbuild/customize-by-directory#directorybuildprops-and-directorybuildtargets) file can set the `<Copyright>` property for all .NET projects in the current and all descendant folders.
+
+The syntax is the same as [.NET SDK-style projects](#net-sdk-style-project).
+
 ### .NET AssemblyInfo file
 
-.NET projects with the `AssemblyInfo.cs` file (such as .NET Framework projects built with an MSBuild-style project, or any .NET SDK-style project built with `<GenerateAssemblyInfo>` set to `false`) can use the `[assembly: AssemblyCopyright]` assembly-level attribute.
+.NET projects with the `AssemblyInfo.cs` file (such as .NET Framework projects built with an MSBuild-style project, or any .NET SDK-style project built with `<GenerateAssemblyInfo>` set to `false`) can use the [`[assembly: AssemblyCopyright]`](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assemblycopyrightattribute) assembly-level attribute.
 
 ```cs
 using System.Reflection;
@@ -72,7 +78,7 @@ If the current year is 2026, you can use this program to automatically update th
 ```
 
 ## Prerequisites
-- [.NET Runtime 8 for Windows x64 or later](https://dotnet.microsoft.com/en-us/download)
+- [.NET 10 Runtime or later](https://dotnet.microsoft.com/en-us/download)
 
 ## Installation
 1. Download [`Copywriter.exe`](https://github.com/Aldaviva/Copywriter/releases/latest/download/Copywriter.exe) from the [latest release](https://github.com/Aldaviva/Copywriter/releases/latest).

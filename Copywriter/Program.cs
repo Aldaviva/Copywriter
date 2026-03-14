@@ -4,30 +4,34 @@ using DiffPlex.Chunkers;
 using DiffPlex.DiffBuilder;
 using DiffPlex.DiffBuilder.Model;
 using McMaster.Extensions.CommandLineUtils;
-using System.Drawing;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
+using Unfucked;
+using static System.ConsoleColor;
+using static Unfucked.ConsoleControl;
 
 BomSquad.DefuseUtf8Bom();
 Console.OutputEncoding = Encoding.UTF8; // make command prompt show "©" instead of "c"
 
-Regex yearPattern = new(@"\b\d{4}\b", RegexOptions.RightToLeft);
+const StringComparison CASE_INSENSITIVE = StringComparison.OrdinalIgnoreCase;
 
 int replacementCount = 0, fileCount = 0;
 int currentYear      = DateTime.Now.Year;
 
 var optionsParser = new CommandLineApplication<Options> {
     UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.Throw,
-    Description                  = "Automatically update copyright years in project sources. Handles .NET SDK-style .csproj files and .NET AssemblyInfo.cs files."
+    Description                  = "Automatically update copyright years in project sources. Handles .NET SDK-style .csproj, .NET AssemblyInfo.cs, and .NET Directory.Build.props files."
 };
+optionsParser.VersionOptionFromAssemblyAttributes(Assembly.GetEntryAssembly()!);
 optionsParser.Conventions.UseDefaultConventions();
 optionsParser.ExtendedHelpText = $"""
 
     Examples:
-      Update copyright year for the .csproj file in the current directory:
+      Update copyright year for files in the current directory:
         {optionsParser.Name}
         
       Preview changes, but don't write them:
@@ -40,27 +44,21 @@ optionsParser.ExtendedHelpText = $"""
         {optionsParser.Name} -d 3 --include-name 'Ben' --include-name '$(Authors)' "C:\Users\Ben\Documents\Projects"
     """;
 optionsParser.Parse(args);
+if (optionsParser.IsShowingInformation) return;
 Options options = optionsParser.Model;
-if (optionsParser.OptionHelp?.HasValue() ?? false) {
-    return;
-}
 
-CancellationTokenSource cts = new();
-Console.CancelKeyPress += (_, eventArgs) => {
-    cts.Cancel();
-    eventArgs.Cancel = true;
-};
+using CancellationTokenSource cts = new CancellationTokenSource().CancelOnCtrlC();
 
-string enumerationRoot = Path.GetFullPath(options.parentDirectory ?? ".");
-EnumerationOptions enumerationOptions = new() {
+string searchRoot = Path.GetFullPath(options.parentDirectory ?? ".");
+EnumerationOptions searchOptions = new() {
     MatchCasing           = MatchCasing.CaseInsensitive,
     RecurseSubdirectories = options.maxDepth > 0,
     MaxRecursionDepth     = options.maxDepth
 };
 
 try {
-    await Task.WhenAll(new[] { "*.csproj", "AssemblyInfo.cs" }
-        .SelectMany(pattern => Directory.EnumerateFiles(enumerationRoot, pattern, enumerationOptions))
+    await Task.WhenAll(((IEnumerable<string>) ["*.csproj", "AssemblyInfo.cs", "Directory.Build.props"])
+        .SelectMany(pattern => Directory.EnumerateFiles(searchRoot, pattern, searchOptions))
         .Where(filename => !options.excludedSubdirectories.Any()
             || (Path.GetDirectoryName(filename)?.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).Intersect(options.excludedSubdirectories).Any() ?? true))
         .Select(handleFile));
@@ -71,9 +69,9 @@ try {
 Console.WriteLine($"{(options.isDryRun ? "Would have made" : "Made")} {replacementCount:N0} replacements in {fileCount:N0} files.");
 
 Task handleFile(string filename) {
-    if (Path.GetExtension(filename).Equals(".csproj", StringComparison.OrdinalIgnoreCase)) {
+    if (Path.GetExtension(filename).Equals(".csproj", CASE_INSENSITIVE) || Path.GetFileName(filename).Equals("Directory.Build.props", CASE_INSENSITIVE)) {
         return handleCsprojFile(filename);
-    } else if (Path.GetFileName(filename).Equals("AssemblyInfo.cs", StringComparison.OrdinalIgnoreCase)) {
+    } else if (Path.GetFileName(filename).Equals("AssemblyInfo.cs", CASE_INSENSITIVE)) {
         return handleAssemblyInfoFile(filename);
     }
 
@@ -84,23 +82,22 @@ async Task handleAssemblyInfoFile(string filename) {
     string oldFileText = await File.ReadAllTextAsync(filename, cts.Token);
     bool   fileChanged = false;
 
-    string newFileText = Regex.Replace(oldFileText, """(?<prefix>\[\s*assembly\s*:\s*(?:System\s*\.\s*Reflection\s*\.\s*)?AssemblyCopyright\s*\(\s*")(?<attributeValue>.*?)(?<suffix>"\s*\)\s*\])""",
-        match => {
-            string oldAttributeValue = match.Groups["attributeValue"].Value;
-            bool   editAllowed       = isAllowedToEdit(oldAttributeValue);
-            string newAttributeValue = editAllowed ? replaceYear(oldAttributeValue) : oldAttributeValue;
-            int    lineNumber        = oldFileText[..match.Index].Count(c => c == '\n') + 1;
-            string replacement       = match.Groups["prefix"].Value + newAttributeValue + match.Groups["suffix"].Value;
+    string newFileText = assemblyCopyrightPattern.Replace(oldFileText, match => {
+        string oldAttributeValue = match.Value;
+        bool   editAllowed       = isAllowedToEdit(oldAttributeValue);
+        string replacement       = editAllowed ? replaceYear(oldAttributeValue) : oldAttributeValue;
+        int    lineNumber        = oldFileText[..match.Index].Count(c => c == '\n') + 1;
+        int    columnNumber      = match.Index - oldFileText[..match.Index].LastIndexOf('\n');
 
-            fileChanged |= editAllowed && !newAttributeValue.Equals(oldAttributeValue, StringComparison.Ordinal);
+        fileChanged |= editAllowed && !replacement.Equals(oldAttributeValue, StringComparison.Ordinal);
 
-            if (fileChanged) {
-                printDiff(filename, lineNumber, match.Value, replacement);
-                replacementCount++;
-            }
+        if (fileChanged) {
+            printDiff(filename, lineNumber, columnNumber, match.Value, replacement);
+            replacementCount++;
+        }
 
-            return replacement;
-        }, RegexOptions.Singleline);
+        return replacement;
+    });
 
     if (fileChanged) {
         fileCount++;
@@ -124,13 +121,15 @@ async Task handleCsprojFile(string filename) {
             continue;
         }
 
-        int    lineNumber        = ((IXmlLineInfo) copyrightEl).LineNumber;
-        string newCopyrightValue = replaceYear(copyrightText.Value);
+        IXmlLineInfo matchPosition     = copyrightText;
+        int          lineNumber        = matchPosition.LineNumber;
+        int          columnNumber      = matchPosition.LinePosition;
+        string       newCopyrightValue = replaceYear(copyrightText.Value);
 
         if (!copyrightText.Value.Equals(newCopyrightValue, StringComparison.Ordinal)) {
             docChanged = true;
             replacementCount++;
-            printDiff(filename, lineNumber, copyrightText.Value, newCopyrightValue);
+            printDiff(filename, lineNumber, columnNumber, copyrightText.Value, newCopyrightValue);
         }
 
         copyrightText.Value = newCopyrightValue;
@@ -143,7 +142,7 @@ async Task handleCsprojFile(string filename) {
                 OmitXmlDeclaration = !docHasProlog,
                 CloseOutput        = true,
                 Async              = true,
-                Indent             = false
+                Indent             = false // use existing indentation with LoadOptions.PreserveWhitespace when file was loaded
             });
             await doc.SaveAsync(xmlWriter, cts.Token);
         }
@@ -154,21 +153,31 @@ string replaceYear(string existingCopyrightLine) => yearPattern.Replace(existing
 
 bool isAllowedToEdit(string copyrightLine) =>
     options.excludeCopyrightOwnerNames.All(excluded => !copyrightLine.Contains(excluded, StringComparison.CurrentCulture)) &&
-    options.includeCopyrightOwnerNames.Any(included => copyrightLine.Contains(included, StringComparison.CurrentCulture));
+    (!options.includeCopyrightOwnerNames.Any() || options.includeCopyrightOwnerNames.Any(included => copyrightLine.Contains(included, StringComparison.CurrentCulture)));
 
 [MethodImpl(MethodImplOptions.Synchronized)]
-static void printDiff(string filename, int lineNumber, string oldText, string newText) {
-    Console.WriteLine($"{filename}:{lineNumber:N0}");
+static void printDiff(string filename, int lineNumber, int columnNumber, string oldText, string newText) {
+    Console.WriteLine($"{Color(filename, Blue)}:{Color(lineNumber.ToString("N0"), Cyan)}:{Color(columnNumber.ToString("N0"), Cyan)}");
     DiffPaneModel diffPaneModel = InlineDiffBuilder.Diff(oldText, newText, chunker: WordChunker.Instance);
     foreach (DiffPiece piece in diffPaneModel.Lines) {
-        Color color = piece.Type switch {
-            ChangeType.Deleted  => Color.Red,
-            ChangeType.Inserted => Color.Green,
-            _                   => Color.Gray
+        (ConsoleColor? foreground, ConsoleColor? background) color = piece.Type switch {
+            ChangeType.Deleted  => (White, DarkRed),
+            ChangeType.Inserted => (White, DarkGreen),
+            _                   => (Gray, null)
         };
-        Colorful.Console.Write(piece.Text, color);
+        Write(piece.Text, color.foreground, color.background);
     }
 
     Console.WriteLine();
     Console.WriteLine();
+}
+
+internal sealed partial class Program {
+
+    [GeneratedRegex(@"\b\d{4}\b", RegexOptions.RightToLeft)]
+    private static partial Regex yearPattern { get; }
+
+    [GeneratedRegex("""(?<=\[\s*assembly\s*:\s*(?:System\s*\.\s*Reflection\s*\.\s*)?AssemblyCopyright\s*\(\s*")(.*?)(?="\s*\)\s*\])""", RegexOptions.Singleline)]
+    private static partial Regex assemblyCopyrightPattern { get; }
+
 }
