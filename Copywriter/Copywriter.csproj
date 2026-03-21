@@ -27,7 +27,7 @@
         <PackageReference Include="Bom.Squad" Version="0.3.0" />
         <PackageReference Include="DiffPlex" Version="1.9.0" />
         <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="5.0.1" />
-        <PackageReference Include="Unfucked" Version="0.0.1-beta.32" />
+        <PackageReference Include="Unfucked" Version="0.0.1-beta.33" />
     </ItemGroup>
 
 </Project>
