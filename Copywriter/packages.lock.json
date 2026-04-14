@@ -16,15 +16,15 @@
       },
       "McMaster.Extensions.CommandLineUtils": {
         "type": "Direct",
-        "requested": "[5.0.1, )",
-        "resolved": "5.0.1",
-        "contentHash": "dXerCHdnTrlpoQjdpxBISv9OIqqziJph1bKOTK95nPG0m7yDyMyVmQDcE1Z10ZZlQeaod1C8zewOW+MQOgPWhw=="
+        "requested": "[5.1.0, )",
+        "resolved": "5.1.0",
+        "contentHash": "YceiKmxdsBrlkAJpmJ2N8XkLyAH01xLsm4VLfjNp5MvtAom2wflZtEBz3CLMQret6Z7jSh3oBO1ULF1Is0tNxA=="
       },
       "Unfucked": {
         "type": "Direct",
-        "requested": "[0.0.1-beta.37, )",
-        "resolved": "0.0.1-beta.37",
-        "contentHash": "gyVcRPi+dXa32hhl1UPwL3w6/PIiRr+q/riG5BCvfgoQV/5j4+A3t4CbOKdTmVopAyVypIR+JbRbTWIKW3oUaA=="
+        "requested": "[0.0.1-beta.39, )",
+        "resolved": "0.0.1-beta.39",
+        "contentHash": "+Ry65cEmcD4Os7qbKVsTdTofmE2cv3zUo92UGc+GZFS4I4NIiYSx1UFp5xSOdD5oQDO84WOa2MaSv15ZdFbqQQ=="
       }
     },
     "net10.0/win-x64": {}

@@ -86,7 +86,7 @@ async Task handleAssemblyInfoFile(string filename) {
         string oldAttributeValue = match.Value;
         bool   editAllowed       = isAllowedToEdit(oldAttributeValue);
         string replacement       = editAllowed ? replaceYear(oldAttributeValue) : oldAttributeValue;
-        int    lineNumber        = oldFileText[..match.Index].Count(c => c == '\n') + 1;
+        int    lineNumber        = oldFileText[..match.Index].Count(static c => c == '\n') + 1;
         int    columnNumber      = match.Index - oldFileText[..match.Index].LastIndexOf('\n');
 
         fileChanged |= editAllowed && !replacement.Equals(oldAttributeValue, StringComparison.Ordinal);
@@ -172,7 +172,7 @@ static void printDiff(string filename, int lineNumber, int columnNumber, string 
     Console.WriteLine();
 }
 
-internal sealed partial class Program {
+internal static partial class Program {
 
     [GeneratedRegex(@"\b\d{4}\b", RegexOptions.RightToLeft)]
     private static partial Regex yearPattern { get; }
