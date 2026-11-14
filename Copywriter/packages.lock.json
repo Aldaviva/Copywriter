@@ -22,9 +22,9 @@
       },
       "Unfucked": {
         "type": "Direct",
-        "requested": "[0.0.1-beta.53, )",
-        "resolved": "0.0.1-beta.53",
-        "contentHash": "cn/CRmctaDM/gbQhynqxYF0NX0L7fV0dw5TvcqAGhjhB9hNAHw7joP1h/qV+hhl1b1TC0UkfS8JcaysQpBj+VA=="
+        "requested": "[0.0.1-beta.62, )",
+        "resolved": "0.0.1-beta.62",
+        "contentHash": "UtUSyKAW0Gxy3OamuI2kdVADLXqWRMRjKslnvfz5BmRDdoAd5s3s2iZoTBk4XBmJjKfPzAowgyD2KuVt+ePw5g=="
       }
     },
     "net10.0/win-x64": {}
