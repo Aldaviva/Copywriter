@@ -4,9 +4,9 @@
     "net10.0": {
       "Bom.Squad": {
         "type": "Direct",
-        "requested": "[0.3.0, )",
-        "resolved": "0.3.0",
-        "contentHash": "XzhQ6cpYMDACcRosaHBO8P8SGAJ2GBC/9Hcb0WUUe9UTUCttr3PrIWf7r+bg6sDCu3/gPWPgh8lfHMTXAi/v3A=="
+        "requested": "[0.4.0, )",
+        "resolved": "0.4.0",
+        "contentHash": "O6cK6HfcuBS1DmMV1BWqRyD872yXTiP6PrzRln9bplqEEHU+2O0UfMNjlNtQtA95mlDHeYZKAcBClpP+71+hrg=="
       },
       "DiffPlex": {
         "type": "Direct",
